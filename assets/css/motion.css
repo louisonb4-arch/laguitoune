@@ -230,5 +230,5 @@ html.--js-inview-enabled .fairy span:nth-child(5n) { animation-delay: -2.1s; ani
     translate: none !important;
     clip-path: none !important;
   }
-  html .garland__flag, html .fairy span { animation: none !important; }
+  html .fairy span { animation: none !important; }
 }
