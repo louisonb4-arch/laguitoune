@@ -1,0 +1,198 @@
+/* =========================================================================
+   LA GUITOUNE — Système de motion (Vokum)
+   Geste du projet : la toile qu'on soulève. Loader = auvent qui se lève,
+   photos révélées de bas en haut (on lève le pan de toile), titres masqués
+   par mot, filets qui se déroulent.
+   ========================================================================= */
+
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io:  cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 250ms;
+  --dur-base: 600ms;
+  --dur-slow: 950ms;
+}
+
+@media (max-width: 768px) {
+  :root { --dur-base: 450ms; --dur-slow: 700ms; }
+}
+
+/* ---- délais composables ------------------------------------------------- */
+
+[data-module-delay] { --module-delay: 0ms; }
+
+[data-reveal], [data-split] {
+  --column-delay: 0ms;
+  --self-delay:   0ms;
+  --local-offset: 0ms;
+  --index:        0;
+  --stagger:      0ms;
+  --delay: calc(
+    var(--module-delay, 0ms) + var(--column-delay, 0ms) + var(--self-delay, 0ms)
+    + var(--index, 0) * var(--stagger, 0ms) + var(--local-offset, 0ms)
+  );
+}
+
+[data-module-delay] > [data-reveal]:nth-child(2) { --self-delay:  90ms; }
+[data-module-delay] > [data-reveal]:nth-child(3) { --self-delay: 180ms; }
+[data-module-delay] > [data-reveal]:nth-child(4) { --self-delay: 270ms; }
+[data-module-delay] > [data-reveal]:nth-child(5) { --self-delay: 360ms; }
+[data-module-delay] > [data-reveal]:nth-child(6) { --self-delay: 450ms; }
+
+/* ---- keyframes ---------------------------------------------------------- */
+
+@keyframes v-fade      { from { opacity: 0; } }
+@keyframes v-translate { from { translate: var(--tx, 0px) var(--ty, 0px); } }
+@keyframes v-scaleX    { from { scale: var(--sx, 1) 1; } }
+
+@keyframes v-clip {
+  from { clip-path: inset(var(--top, 0%) var(--right, 0%) var(--bottom, 0%) var(--left, 0%) round var(--radius, 0px)); }
+  to   { clip-path: inset(0% 0% 0% 0% round var(--radius, 0px)); }
+}
+
+/* ---- états initiaux ----------------------------------------------------- */
+
+html.--js-inview-enabled [data-reveal] {
+  --ty: 1.5rem;
+  animation:
+    v-translate var(--dur-base, 600ms) var(--ease-out, ease) var(--delay, 0ms) backwards,
+    v-fade      var(--dur-base, 600ms) linear               var(--delay, 0ms) backwards;
+  animation-play-state: paused, paused;
+}
+html.--js-inview-enabled [data-reveal].is-inview {
+  animation-play-state: running, running;
+}
+
+/* a. masque overflow — l'enfant monte */
+html.--js-inview-enabled [data-reveal="mask"] {
+  overflow: hidden;
+  animation: none;
+}
+html.--js-inview-enabled [data-reveal="mask"] > * {
+  display: block;
+  --ty: 100%;
+  animation: v-translate var(--dur-slow, 950ms) var(--ease-out, ease) var(--delay, 0ms) backwards;
+  animation-play-state: paused;
+}
+html.--js-inview-enabled [data-reveal="mask"].is-inview > * {
+  animation-play-state: running;
+}
+
+/* b. clip — on lève le pan de toile : la photo se découvre de bas en haut */
+html.--js-inview-enabled [data-reveal="clip"] {
+  --top: 100%; --right: 0%; --bottom: 0%; --left: 0%;
+  --radius: var(--r-photo, 0px);
+  animation: v-clip var(--dur-slow, 950ms) var(--ease-out, ease) var(--delay, 0ms) backwards;
+  animation-play-state: paused;
+}
+html.--js-inview-enabled [data-reveal="clip"].is-inview {
+  animation-play-state: running;
+}
+
+/* c. filet qui se déroule */
+html.--js-inview-enabled [data-reveal="line"] {
+  --sx: 0;
+  transform-origin: left center;
+  animation: v-scaleX var(--dur-slow, 950ms) var(--ease-out, ease) var(--delay, 0ms) backwards;
+  animation-play-state: paused;
+}
+html.--js-inview-enabled [data-reveal="line"].is-inview {
+  animation-play-state: running;
+}
+
+/* ---- stagger typographique ---------------------------------------------- */
+
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.word__inner { display: inline-block; }
+
+html.--js-inview-enabled [data-split] .word__inner {
+  --ty: 110%;
+  animation: v-translate var(--dur-slow, 950ms) var(--ease-out, ease)
+             calc(var(--delay, 0ms) + var(--word-index, 0) * var(--word-stagger, 60ms)) backwards;
+  animation-play-state: paused;
+}
+html.--js-inview-enabled [data-split].is-inview .word__inner {
+  animation-play-state: running;
+}
+
+/* ---- loader : la toile de l'auvent -------------------------------------- */
+
+.site-loader {
+  position: fixed;
+  inset: 0;
+  height: 100lvh;
+  z-index: 999;
+  background: var(--creme);
+  display: grid;
+  place-items: center;
+  will-change: translate;
+}
+.site-loader::after {
+  /* bord festonné de l'auvent, accroché sous la toile */
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background: radial-gradient(circle at 50% 0, var(--creme) 66%, transparent 68%);
+  background-size: 34px 18px;
+  background-repeat: repeat-x;
+}
+.site-loader__badge {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0.5rem;
+  width: min(58vw, 240px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--olive);
+  color: var(--creme);
+  text-align: center;
+  animation: v-fade 500ms linear 150ms backwards;
+}
+.site-loader__name {
+  font-family: "Young Serif", serif;
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  letter-spacing: 0.01em;
+}
+.site-loader__tag {
+  font-family: "Caveat", cursive;
+  font-size: clamp(1.05rem, 4vw, 1.3rem);
+  color: var(--sauge-pale);
+}
+.site-loader.--js-ready {
+  translate: 0 calc(-100% - 20px);
+  transition: translate 850ms var(--ease-io) 250ms;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-loader { display: none; }
+}
+
+/* ---- accessibilité — dernier mot ---------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  html [data-reveal],
+  html [data-reveal] > *,
+  html [data-split] .word__inner {
+    animation: none !important;
+    opacity: 1 !important;
+    translate: none !important;
+    clip-path: none !important;
+  }
+}
