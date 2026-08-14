@@ -129,47 +129,6 @@ a { color: inherit; }
   color: var(--olive);
 }
 
-/* ---- guirlande de fanions ------------------------------------------------ */
-
-.garland {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  gap: clamp(0.9rem, 3vw, 2.2rem);
-  padding: 0 var(--pad-x);
-  height: 46px;
-  overflow: hidden;
-}
-.garland::before {
-  /* la corde */
-  content: "";
-  position: absolute;
-  top: 7px;
-  left: -2%;
-  right: -2%;
-  height: 12px;
-  border-top: 2px solid rgba(76, 92, 49, 0.45);
-  border-radius: 50%;
-}
-.garland__flag {
-  width: 26px;
-  height: 30px;
-  margin-top: 10px;
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  transform-origin: 50% 0;
-  flex: none;
-}
-.garland__flag:nth-child(5n+1) { background: var(--sauge); }
-.garland__flag:nth-child(5n+2) { background: var(--jaune); rotate: 2deg; }
-.garland__flag:nth-child(5n+3) { background: var(--orange); rotate: -1.5deg; }
-.garland__flag:nth-child(5n+4) { background: var(--olive); rotate: 1deg; }
-.garland__flag:nth-child(5n)   { background: var(--ciel); rotate: -2deg; }
-.garland.--on-dark::before { border-top-color: rgba(247, 241, 226, 0.35); }
-
-@media (max-width: 640px) {
-  .garland__flag:nth-child(n+13) { display: none; }
-}
-
 /* ---- header ------------------------------------------------------------- */
 
 .site-header {

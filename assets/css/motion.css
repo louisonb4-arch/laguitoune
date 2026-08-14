@@ -140,18 +140,6 @@ html.--js-inview-enabled [data-split].is-inview .word__inner {
 
 /* ---- ambiances continues -------------------------------------------------- */
 
-/* fanions : balancement doux, décalé de proche en proche */
-@keyframes v-sway {
-  from { rotate: -2.6deg; }
-  to   { rotate: 2.6deg; }
-}
-html.--js-inview-enabled .garland__flag {
-  animation: v-sway 2.8s var(--ease-io) infinite alternate;
-}
-html.--js-inview-enabled .garland__flag:nth-child(2n) { animation-duration: 3.4s; animation-delay: -1.1s; }
-html.--js-inview-enabled .garland__flag:nth-child(3n) { animation-delay: -2s; }
-html.--js-inview-enabled .garland__flag:nth-child(5n) { animation-duration: 3.1s; animation-delay: -0.6s; }
-
 /* guirlande lumineuse : scintillement discret */
 @keyframes v-twinkle {
   from { opacity: 1; }
